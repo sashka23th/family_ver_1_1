@@ -9,12 +9,33 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^8.1.3
+  flutter_bloc: ^9.0.0
+  equatable: ^2.0.7
+  dartz: ^0.10.1
+  shared_preferences: ^2.3.1
+  http: ^1.2.2
+  get_it: ^8.0.3
+  internet_connection_checker: ^3.0.1
+  intl: ^0.20.2
+  fl_chart: ^0.69.0
+  flutter_colorpicker: ^1.1.0
+  auto_size_text: ^3.0.0
+  device_info_plus: ^11.1.1
+  bloc: ^9.0.0
+  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.2
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.png"  # Укажи путь к иконке
+  adaptive_icon_background: "#ffffff"  # Фон адаптивной иконки для Android
+  adaptive_icon_foreground: "assets/icon.png" # Файл переднего плана (опционально)
 
 flutter:
   uses-material-design: true
@@ -32,3 +53,6 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
+  
+  assets:
+    - assets/login_image.png

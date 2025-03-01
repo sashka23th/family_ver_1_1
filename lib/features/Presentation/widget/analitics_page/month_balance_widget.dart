@@ -7,16 +7,6 @@ Widget _buildMonthBalanceList({
   required Function(int id) onDelete,
   required Function(PaymentModel payment) onUpdate,
 }) {
-  final List<Prefix> prefixes = [Prefix.exp, Prefix.dev, Prefix.bnk];
-  int _selectedIndex = 0;
-  Prefix selectedPrefix = prefixes[_selectedIndex];
-
-  void _onTabTapped(int index) {
-    //setState(() {
-    _selectedIndex = index;
-    //});
-  }
-
   final Map<String, List<CategoryEntity>> groupedCategories = {};
   for (var category in categories) {
     groupedCategories
@@ -34,20 +24,6 @@ Widget _buildMonthBalanceList({
     final sign = category.prefix == Prefix.exp ? -1 : 1;
     return payment.amount * sign;
   }).fold(0.0, (sum, amount) => sum + amount);
-
-  //final List<String> _titles = ["Доходы", "Расходы", "Банки"];
-
-  /// Метод для получения суммы платежей по ID категории
-  double getTotalByCategory(int categoryId) {
-    return analyticResult.payments
-        .where((p) => p.categoryId == categoryId)
-        .fold(0, (sum, p) => sum + p.amount);
-  }
-
-  // Фильтруем категории по текущему префиксу
-  List<CategoryEntity> filteredCategories =
-      categories.where((c) => c.prefix == selectedPrefix).toList();
-
   return Column(
     children: [
       Padding(
@@ -71,51 +47,28 @@ Widget _buildMonthBalanceList({
         ),
       ),
       Expanded(
-          child: Scaffold(
-        body: ListView.builder(
-          itemCount: filteredCategories.length,
+        child: ListView.builder(
+          itemCount: groupedCategories.keys.length,
           itemBuilder: (context, index) {
-            final category = filteredCategories[index];
-            double totalAmount = getTotalByCategory(category.id);
+            final prefix = groupedCategories.keys.elementAt(index);
+            final categoriesByPrefix = groupedCategories[prefix]!;
+            double totalGroupCategory = analyticResult.payments
+                .where((payment) => categoriesByPrefix
+                    .any((category) => category.id == payment.categoryId))
+                .fold(0.0, (sum, payment) => sum + payment.amount);
 
-            return Card(
-              margin:
-                  const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: category.iconColor,
-                  child: Icon(category.icon, color: Colors.white),
-                ),
-                title: Text(category.name),
-                subtitle: Text(NumberFormat('#,##0.00 ₪').format(totalAmount)),
-                onTap: () => _openPaymentsList(
-                    context, category, categoryPayments, onDelete, onUpdate),
-              ),
-            );
             return _buildPrefixSection(
                 context,
-                selectedPrefix.name,
-                filteredCategories,
-                filteredPayments,
+                prefix,
+                categoriesByPrefix,
+                analyticResult.payments,
                 onDelete,
                 onUpdate,
                 totalGroupCategory,
                 Colors.green);
           },
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onTabTapped,
-          items: [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.trending_up), label: "Доходы"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.trending_down), label: "Расходы"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.account_balance), label: "Банки"),
-          ],
-        ),
-      )),
+      ),
       const SizedBox(height: 4),
       const Divider(),
       Container(
